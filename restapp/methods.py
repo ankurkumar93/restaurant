@@ -25,7 +25,17 @@ def GetRestaurant(token):
 #     return True
 
 
-def GetRestaurantPhone(userid, password):
+def GetRestaurantPhone(userid, password=None):
+    if not password:
+        try:
+            if '@' not in userid:
+                restaurant = RestaurantProfile.objects.get(phone=userid)
+                return restaurant
+            else:
+                restaurant = RestaurantProfile.objects.get(email=userid)
+                return restaurant
+        except:
+            return None
     try:
         if '@' not in userid:
             restaurant = RestaurantProfile.objects.get(phone=userid)
