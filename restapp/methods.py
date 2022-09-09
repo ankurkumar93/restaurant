@@ -2,6 +2,7 @@ from .models import *
 from rest_framework.exceptions import NotAuthenticated, AuthenticationFailed, NotFound
 import jwt
 from rest import settings
+from django.contrib.auth.hashers import check_password
 
 
 def GetRestaurant(token):
@@ -17,3 +18,27 @@ def GetRestaurant(token):
         return restaurant
     except:
         raise NotFound
+    
+# def CheckPassword(userid, password):
+#     print("sasasasasasasa", userid)
+#     userpassword = RestaurantProfile.objects.get(p)
+#     return True
+
+
+def GetRestaurantPhone(userid, password):
+    try:
+        if '@' not in userid:
+            restaurant = RestaurantProfile.objects.get(phone=userid)
+            if check_password(password, restaurant.__dict__['password']):
+                return restaurant
+            else:
+                return None
+        else:
+            restaurant = RestaurantProfile.objects.get(email=userid)
+            if check_password(password, restaurant.__dict__['password']):
+                return restaurant
+            else:
+                return None
+    except:
+        return None
+    

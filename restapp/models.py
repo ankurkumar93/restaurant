@@ -6,15 +6,18 @@ from unicodedata import category
 from django.db import models
 
 class RestaurantProfile(models.Model):
-    name = models.CharField(primary_key=True, max_length=100, null=False, blank=True)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, null=False, blank=True)
     number_of_tables = models.IntegerField(default=1)
-    contact = models.CharField(max_length=10, null=True)
+    phone = models.CharField(max_length=10, null=False)
     address = models.CharField(max_length=255, null=True)
     gstn = models.CharField(max_length=100, null=True)
     pan = models.CharField(max_length=100, null=True)
     instagram = models.CharField(max_length=100, null=True)
     facebook = models.CharField(max_length=100, null=True)
     website = models.CharField(max_length=100, null=True)
+    password = models.CharField(max_length=100, null=True)
+    email = models.EmailField()
 
     def __str__(self):
         return self.name
