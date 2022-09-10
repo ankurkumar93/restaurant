@@ -74,7 +74,7 @@ class LoginAPIView(APIView):
                 'date':str(datetime.now())
             }
             accessToken = jwt.encode(payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm='HS256')
-            return Response({'access_token':accessToken}, status=status.HTTP_200_OK)
+            return Response({'access_token':accessToken, 'userid':userid}, status=status.HTTP_200_OK)
 
         except Exception as err:
             return Response({'data':str(err)}, status=status.HTTP_400_BAD_REQUEST)
