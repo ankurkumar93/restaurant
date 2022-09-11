@@ -79,14 +79,14 @@ WSGI_APPLICATION = 'rest.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
+    'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
     #     'NAME': 'restaurant',
     #     'USER': 'postgres',
     #     'PASSWORD': 'postgres',
     #     'HOST': 'localhost',
     #     'PORT': '5432'
-    # }
+    }
 }
 
 import dj_database_url
