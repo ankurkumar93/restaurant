@@ -56,3 +56,12 @@ class Bill(models.Model):
     def __str__(self):
         return self.id
 
+
+class Customer(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, null=False)
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=10)
+    restaurant = models.ManyToManyField(RestaurantProfile)
+
+    def __str__(self):
+        return self.name

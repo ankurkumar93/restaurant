@@ -79,14 +79,14 @@ WSGI_APPLICATION = 'rest.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'restaurant',
-        # 'USER': 'postgres',
-        # 'PASSWORD': 'postgres',
-        # 'HOST': 'localhost',
-        # 'PORT': '5432'
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'restaurant',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'postgres',
+    #     'HOST': 'localhost',
+    #     'PORT': '5432'
+    # }
 }
 
 import dj_database_url
@@ -133,28 +133,31 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+import datetime
+from datetime import timedelta
+SIMPLE_JWT = {
+'ACCESS_TOKEN_LIFETIME': timedelta(days=60),
+'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
+'ROTATE_REFRESH_TOKENS': False,
+'BLACKLIST_AFTER_ROTATION': True,
 
-JWT_AUTH = {
-    'JWT_SECRET_KEY': SECRET_KEY,
-    'JWT_GET_USER_SECRET_KEY': None,
-    'JWT_ALGORITHM': 'HS256',
-    'JWT_INSIST_ON_KID': False,
-    'JWT_TOKEN_ID': 'require',
-    'JWT_ENCODE_HANDLER':
-        'rest_framework_jwt.utils.jwt_encode_payload',
-    'JWT_DECODE_HANDLER':
-        'rest_framework_jwt.utils.jwt_decode_token',
-    'JWT_PAYLOAD_HANDLER':
-        'rest_framework_jwt.utils.jwt_create_payload',
-    'JWT_PAYLOAD_GET_USERNAME_HANDLER':
-        'rest_framework_jwt.utils.jwt_get_username_from_payload_handler',
-    'JWT_PAYLOAD_INCLUDE_USER_ID': True,
-    'JWT_VERIFY': True,
-    'JWT_VERIFY_EXPIRATION': True,
-    'JWT_LEEWAY': 0,
-    'JWT_AUTH_COOKIE_PATH': '/',
-    'JWT_AUTH_COOKIE_SECURE': True,
-    'JWT_AUTH_COOKIE_SAMESITE': 'Lax',
-    'JWT_IMPERSONATION_COOKIE': None,
-    'JWT_DELETE_STALE_BLACKLISTED_TOKENS': True,
+'ALGORITHM': 'HS256',
+'SIGNING_KEY': SECRET_KEY,
+'VERIFYING_KEY': None,
+'AUDIENCE': None,
+'ISSUER': None,
+
+'AUTH_HEADER_TYPES': ('Bearer',),
+'USER_ID_FIELD': 'id',
+'USER_ID_CLAIM': 'user_id',
+
+'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+'TOKEN_TYPE_CLAIM': 'token_type',
+
+'JTI_CLAIM': 'jti',
+'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+'SLIDING_TOKEN_LIFETIME': timedelta(days=10),
+'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=20),
 }

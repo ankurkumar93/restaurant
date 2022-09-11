@@ -7,7 +7,10 @@ from .serializers import RestaurantProfileSerializer,LoginSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest import settings
-import jwt
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+
 class RestaurantProfileView(APIView):
     serializer_class = RestaurantProfileSerializer
 
@@ -41,7 +44,7 @@ class RestaurantProfileView(APIView):
 
     def get(self, request):
         userid = request.GET.get('userid')
-        restaurant = GetRestaurantPhone(userid)
+        restaurant = GetRestaurantByUserId(userid)
         if not restaurant:
             return Response({'message': 'User with given id not found'}, status=status.HTTP_404_NOT_FOUND)
         restaurantdata = {
@@ -66,17 +69,55 @@ class LoginAPIView(APIView):
             userid = serializer.data['userid']
             password = serializer.data['password']
 
-            restaurant = GetRestaurantPhone(userid, password)
+            restaurant = GetRestaurantByUserId(userid, password)
             if not restaurant:
                 return Response({'message': 'User with given credentials not found'}, status=status.HTTP_404_NOT_FOUND)
-            payload = {
-                'email': userid,
-                'date':str(datetime.now())
-            }
-            accessToken = jwt.encode(payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm='HS256')
-            return Response({'access_token':accessToken, 'userid':userid}, status=status.HTTP_200_OK)
+            accessToken = AccessToken.for_user(request.user)
+            accessToken['userid'] = userid
+            
+
+            return Response({'access_token':str(accessToken), 'userid':userid}, status=status.HTTP_200_OK)
 
         except Exception as err:
             return Response({'data':str(err)}, status=status.HTTP_400_BAD_REQUEST)
 
     
+class CustomerView(APIView):
+    
+    def post(self, request):
+        try:
+            accessToken = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+            tokenData = AccessToken(accessToken)
+        except:
+            return Response({'message':'Token is invalid or expired'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        restaurantObject = GetRestaurantByUserId(tokenData['userid'])
+        customerPhone = request.data['customerPhone']
+        customerName = request.data['customerName']
+        customerInstance = Customer.objects.create(name=customerName, phone=customerPhone)
+        customerInstance.restaurant.add(restaurantObject)
+        data = {
+            'customerName' : customerName,
+            'customerPhone' : customerPhone,
+
+        }
+        return Response({'data': data}, status=status.HTTP_201_CREATED)
+
+    def get(self,request):
+        phone = request.GET.get('phone')
+        try:
+            accessToken = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+            tokenData = AccessToken(accessToken)
+        except:
+            return Response({'message':'Token is invalid or expired'}, status=status.HTTP_401_UNAUTHORIZED)
+        restaurantObject = GetRestaurantByUserId(tokenData['userid'])
+        customerObject = Customer.objects.filter(restaurant=restaurantObject, phone=phone).first()
+        if customerObject is not None:
+            customerdata = {
+                'customerName': customerObject.name,
+                'customerPhone': customerObject.phone,
+
+            }
+            return Response({'data': customerdata}, status=status.HTTP_200_OK)
+        else:
+            return Response({'data': []}, status=status.HTTP_200_OK)
